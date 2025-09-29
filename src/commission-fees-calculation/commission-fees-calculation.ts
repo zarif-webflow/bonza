@@ -27,10 +27,11 @@ const initCommissionFeesCalculation = () => {
     maxDecimals: 0,
   });
 
+  const initialSavingsText = savingsDisplay.textContent || "";
+
   const showConfetti = createElementConfetti(savingsDisplay);
 
   const changeInputValue = (value: string) => {
-    salePriceInput.value = "120,000";
     salePriceInput.value = value;
     salePriceInput.dispatchEvent(new Event("input"));
   };
@@ -38,11 +39,18 @@ const initCommissionFeesCalculation = () => {
   const handleCalculation = () => {
     const parsedSalePrice = parseInt(salePriceInput.value.replace(/,/g, ""), 10);
 
-    const calculatedValues = calculateCommissionFees(
-      Number.isNaN(parsedSalePrice) ? 0 : parsedSalePrice
-    );
+    const isNan = Number.isNaN(parsedSalePrice);
 
-    savingsDisplay.textContent = `${formatWithCommas(Math.floor(calculatedValues.savings).toString(), false)}`;
+    if (isNan) {
+      savingsDisplay.textContent = initialSavingsText;
+      savingsDisplay.classList.add("is-inactive");
+      return;
+    }
+
+    const calculatedValues = calculateCommissionFees(parsedSalePrice);
+
+    savingsDisplay.textContent = `$${formatWithCommas(Math.floor(calculatedValues.savings).toString(), false)}`;
+    savingsDisplay.classList.remove("is-inactive");
     showConfetti();
   };
 
