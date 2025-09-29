@@ -5,7 +5,7 @@ import {
   BONZA_MINIMUM_FEE,
 } from "./constants";
 
-export const calculateComissionFees = (salePrice: number) => {
+export const calculateCommissionFees = (salePrice: number) => {
   const averageBrokerFee = Math.max(salePrice * AVERAGE_BROKER_FEE, AVERAGE_BROKER_MINIMUM_FEE);
   const bonzaFee = Math.max(salePrice * BONZA_FEE, BONZA_MINIMUM_FEE);
   const savings = averageBrokerFee - bonzaFee;

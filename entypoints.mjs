@@ -2,4 +2,4 @@
  * This file defines the entry points for the application.
  * Example: ['src/target_folder/target_file.ts', 'src/target_folder2/target_file2.ts']
  */
-export const ENTRY_POINTS = ["src/comission-fees-calculation/comission-fees-calculation.ts"];
+export const ENTRY_POINTS = ["src/commission-fees-calculation/commission-fees-calculation.ts"];

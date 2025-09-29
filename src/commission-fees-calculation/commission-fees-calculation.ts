@@ -1,20 +1,20 @@
 import { getHtmlElement, getMultipleHtmlElements } from "@taj-wf/utils";
 
-import { calculateComissionFees, enforceNumericInput, formatWithCommas } from "./utils";
+import { calculateCommissionFees, enforceNumericInput, formatWithCommas } from "./utils";
 
-const initComissionFeesCalculation = () => {
+const initCommissionFeesCalculation = () => {
   const salePriceInput = getHtmlElement<HTMLInputElement>({
-    selector: "[comission-fees=sale-input]",
+    selector: "[commission-fees=sale-input]",
     log: "error",
   });
 
   const savingsDisplay = getHtmlElement<HTMLElement>({
-    selector: "[comission-fees=savings-display]",
+    selector: "[commission-fees=savings-display]",
     log: "error",
   });
 
   const calcButton = getHtmlElement<HTMLButtonElement>({
-    selector: "[comission-fees=calc-button]",
+    selector: "[commission-fees=calc-button]",
     log: "error",
   });
 
@@ -35,7 +35,7 @@ const initComissionFeesCalculation = () => {
   const handleCalculation = () => {
     const parsedSalePrice = parseInt(salePriceInput.value.replace(/,/g, ""), 10);
 
-    const calculatedValues = calculateComissionFees(
+    const calculatedValues = calculateCommissionFees(
       Number.isNaN(parsedSalePrice) ? 0 : parsedSalePrice
     );
 
@@ -52,13 +52,13 @@ const initComissionFeesCalculation = () => {
 
   const setupQuickExampleButtons = () => {
     const exampleButtons = getMultipleHtmlElements<HTMLButtonElement>({
-      selector: "[comission-example-price]",
+      selector: "[commission-example-price]",
     });
 
     if (!exampleButtons) return;
 
     for (const button of exampleButtons) {
-      const examplePrice = button.getAttribute("comission-example-price");
+      const examplePrice = button.getAttribute("commission-example-price");
       if (!examplePrice) continue;
 
       button.addEventListener("click", () => {
@@ -71,4 +71,4 @@ const initComissionFeesCalculation = () => {
   setupQuickExampleButtons();
 };
 
-initComissionFeesCalculation();
+initCommissionFeesCalculation();
