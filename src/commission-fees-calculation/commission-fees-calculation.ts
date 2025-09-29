@@ -1,5 +1,6 @@
 import { getHtmlElement, getMultipleHtmlElements } from "@taj-wf/utils";
 
+import { createElementConfetti } from "./element-confetti";
 import { calculateCommissionFees, enforceNumericInput, formatWithCommas } from "./utils";
 
 const initCommissionFeesCalculation = () => {
@@ -26,6 +27,8 @@ const initCommissionFeesCalculation = () => {
     maxDecimals: 0,
   });
 
+  const showConfetti = createElementConfetti(savingsDisplay);
+
   const changeInputValue = (value: string) => {
     salePriceInput.value = "120,000";
     salePriceInput.value = value;
@@ -40,6 +43,7 @@ const initCommissionFeesCalculation = () => {
     );
 
     savingsDisplay.textContent = `${formatWithCommas(Math.floor(calculatedValues.savings).toString(), false)}`;
+    showConfetti();
   };
 
   calcButton.addEventListener("click", handleCalculation);
