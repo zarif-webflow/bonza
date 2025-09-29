@@ -69,6 +69,11 @@ export function enforceNumericInput(
       return;
     }
 
+    // Allow comma for thousand separators
+    if (key === ",") {
+      return;
+    }
+
     // Allow minus sign if enabled, only at the beginning, and not already present
     if (allowNegative && key === "-" && selectionStart === 0 && !currentValue.includes("-")) {
       return;
@@ -150,11 +155,11 @@ function filterNumericText(
 
   let filtered = text;
 
-  // Remove all non-numeric characters except decimal point and minus sign
+  // Remove all non-numeric characters except decimal point, minus sign, and commas
   let pattern = "[^0-9";
   if (allowDecimals) pattern += ".";
   if (allowNegative) pattern += "-";
-  pattern += "]";
+  pattern += ",]";
 
   filtered = filtered.replace(new RegExp(pattern, "g"), "");
 
@@ -192,5 +197,39 @@ function filterNumericText(
     }
   }
 
+  // Handle commas: format as thousand separators
+  filtered = formatWithCommas(filtered, allowDecimals);
+
   return filtered;
+}
+
+/**
+ * Formats a numeric string with proper comma placement for thousand separators
+ * @param value - The numeric string to format
+ * @param allowDecimals - Whether decimals are allowed
+ * @returns The formatted string with proper comma placement
+ */
+export function formatWithCommas(value: string, allowDecimals: boolean): string {
+  if (!value) return value;
+
+  // Handle negative sign
+  const isNegative = value.startsWith("-");
+  const workingValue = isNegative ? value.substring(1) : value;
+
+  // Split into integer and decimal parts
+  const parts = workingValue.split(".");
+  let integerPart = parts[0] || "";
+  const decimalPart = allowDecimals && parts[1] ? "." + parts[1] : "";
+
+  // Remove existing commas from integer part
+  integerPart = integerPart.replace(/,/g, "");
+
+  // Add commas to integer part (every 3 digits from right)
+  if (integerPart.length > 3) {
+    integerPart = integerPart.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  }
+
+  // Reconstruct the value
+  const result = (isNegative ? "-" : "") + integerPart + decimalPart;
+  return result;
 }
