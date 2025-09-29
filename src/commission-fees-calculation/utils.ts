@@ -238,6 +238,7 @@ export function formatWithCommas(value: string, allowDecimals: boolean): string 
  * Smoothly scrolls to a target element and positions it in the middle of the screen
  * @param target - The target HTML element to scroll to
  * @param options - Optional configuration for the scroll behavior
+ * @returns A promise that resolves when the scrolling is complete
  */
 export function scrollToElementCenter(
   target: HTMLElement,
@@ -245,7 +246,7 @@ export function scrollToElementCenter(
     behavior?: ScrollBehavior;
     offset?: number;
   } = {}
-): void {
+): Promise<void> {
   const { behavior = "smooth", offset = 0 } = options;
 
   // Get element position and dimensions
@@ -259,9 +260,75 @@ export function scrollToElementCenter(
   // Calculate scroll position to center the element
   const scrollPosition = elementTop - viewportHeight / 2 + elementHeight / 2 + offset;
 
-  // Perform the smooth scroll
-  window.scrollTo({
-    top: scrollPosition,
-    behavior,
+  return new Promise<void>((resolve) => {
+    const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Check if scroll position will actually change (with small tolerance for floating point precision)
+    if (Math.abs(currentScrollY - scrollPosition) < 1) {
+      resolve();
+      return;
+    }
+
+    // If behavior is not smooth, resolve immediately after scrolling
+    if (behavior !== "smooth") {
+      window.scrollTo({
+        top: scrollPosition,
+        behavior,
+      });
+      resolve();
+      return;
+    }
+
+    let scrollStarted = false;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+
+    // Clean up function to remove all listeners and timeouts
+    const cleanup = () => {
+      window.removeEventListener("scrollend", handleScrollEnd);
+      window.removeEventListener("scrollstart", handleScrollStart);
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+    };
+
+    // Handle when scrolling ends
+    const handleScrollEnd = () => {
+      cleanup();
+      resolve();
+    };
+
+    // Handle when scrolling starts
+    const handleScrollStart = () => {
+      scrollStarted = true;
+      // Clear the scroll start timeout since scrolling has begun
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.length = 0;
+
+      // Now listen for scroll end
+      window.addEventListener("scrollend", handleScrollEnd);
+
+      // Fallback timeout in case scrollend doesn't fire
+      const fallbackTimeout = setTimeout(() => {
+        cleanup();
+        resolve();
+      }, 2000); // Longer fallback for smooth scrolling
+      timeouts.push(fallbackTimeout);
+    };
+
+    // Listen for scroll start
+    window.addEventListener("scrollstart", handleScrollStart);
+
+    // Timeout to check if scroll started - if not, resolve immediately
+    const scrollStartTimeout = setTimeout(() => {
+      if (!scrollStarted) {
+        cleanup();
+        resolve();
+      }
+    }, 300); // Longer timeout to detect if scroll started
+    timeouts.push(scrollStartTimeout);
+
+    // Perform the smooth scroll
+    window.scrollTo({
+      top: scrollPosition,
+      behavior,
+    });
   });
 }

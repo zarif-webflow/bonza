@@ -1,4 +1,3 @@
-import { wait } from "@finsweet/ts-utils";
 import { getHtmlElement, getMultipleHtmlElements } from "@taj-wf/utils";
 
 import { MOBILE_VIEWPORT_WIDTH } from "./constants";
@@ -74,15 +73,11 @@ const initCommissionFeesCalculation = () => {
 
     const calculatedValues = calculateCommissionFees(parsedSalePrice);
 
-    if (isMobileOrTablet) {
-      scrollToElementCenter(savingsDisplay);
-    }
-
     savingsDisplay.textContent = `$${formatWithCommas(Math.floor(calculatedValues.savings).toString(), false)}`;
     savingsDisplay.classList.remove("is-inactive");
 
     if (isMobileOrTablet) {
-      wait(250).then(() => {
+      scrollToElementCenter(savingsDisplay).then(() => {
         showConfetti();
       });
     } else {
