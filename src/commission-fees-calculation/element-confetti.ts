@@ -19,7 +19,7 @@ export interface ConfettiOptions {
 export function createElementConfetti(
   element: HTMLElement,
   options: ConfettiOptions = {}
-): () => Promise<undefined> | null {
+): () => void {
   // Default values - kept minimal as requested
   const { particleCount = 30, spread = 35 } = options;
 
@@ -32,7 +32,7 @@ export function createElementConfetti(
     const originY = rect.bottom / window.innerHeight;
 
     // Return the confetti call as a function
-    return confetti({
+    confetti({
       particleCount,
       spread,
       angle: 90,
