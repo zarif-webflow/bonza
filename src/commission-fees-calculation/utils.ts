@@ -233,3 +233,35 @@ export function formatWithCommas(value: string, allowDecimals: boolean): string 
   const result = (isNegative ? "-" : "") + integerPart + decimalPart;
   return result;
 }
+
+/**
+ * Smoothly scrolls to a target element and positions it in the middle of the screen
+ * @param target - The target HTML element to scroll to
+ * @param options - Optional configuration for the scroll behavior
+ */
+export function scrollToElementCenter(
+  target: HTMLElement,
+  options: {
+    behavior?: ScrollBehavior;
+    offset?: number;
+  } = {}
+): void {
+  const { behavior = "smooth", offset = 0 } = options;
+
+  // Get element position and dimensions
+  const elementRect = target.getBoundingClientRect();
+  const elementTop = elementRect.top + window.pageYOffset;
+  const elementHeight = elementRect.height;
+
+  // Calculate viewport height
+  const viewportHeight = window.innerHeight;
+
+  // Calculate scroll position to center the element
+  const scrollPosition = elementTop - viewportHeight / 2 + elementHeight / 2 + offset;
+
+  // Perform the smooth scroll
+  window.scrollTo({
+    top: scrollPosition,
+    behavior,
+  });
+}

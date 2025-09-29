@@ -1,7 +1,13 @@
 import { getHtmlElement, getMultipleHtmlElements } from "@taj-wf/utils";
 
+import { MOBILE_VIEWPORT_WIDTH } from "./constants";
 import { createElementConfetti } from "./element-confetti";
-import { calculateCommissionFees, enforceNumericInput, formatWithCommas } from "./utils";
+import {
+  calculateCommissionFees,
+  enforceNumericInput,
+  formatWithCommas,
+  scrollToElementCenter,
+} from "./utils";
 
 const initCommissionFeesCalculation = () => {
   const salePriceInput = getHtmlElement<HTMLInputElement>({
@@ -27,6 +33,24 @@ const initCommissionFeesCalculation = () => {
     maxDecimals: 0,
   });
 
+  let isMobileOrTablet = false;
+
+  const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_VIEWPORT_WIDTH}px)`);
+
+  const handleMediaQueryChange = (e: MediaQueryListEvent | MediaQueryList) => {
+    if (e.matches) {
+      // If the viewport is mobile/tablet
+      isMobileOrTablet = true;
+    } else {
+      // If the viewport is desktop
+      isMobileOrTablet = false;
+    }
+  };
+
+  handleMediaQueryChange(mediaQuery); // Initial check
+
+  mediaQuery.addEventListener("change", handleMediaQueryChange);
+
   const initialSavingsText = savingsDisplay.textContent || "";
 
   const showConfetti = createElementConfetti(savingsDisplay);
@@ -48,6 +72,10 @@ const initCommissionFeesCalculation = () => {
     }
 
     const calculatedValues = calculateCommissionFees(parsedSalePrice);
+
+    if (isMobileOrTablet) {
+      scrollToElementCenter(savingsDisplay);
+    }
 
     savingsDisplay.textContent = `$${formatWithCommas(Math.floor(calculatedValues.savings).toString(), false)}`;
     savingsDisplay.classList.remove("is-inactive");
