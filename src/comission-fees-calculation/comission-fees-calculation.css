@@ -1,0 +1,3 @@
+.sales-calc-input::before {
+  content: "$";
+}
